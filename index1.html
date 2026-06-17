@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TubeKit Pro — YouTube Thumbnail Downloader Ultra HD &amp; SEO Optimization Suite</title>
+<meta name="description" content="TubeKit Pro is the all-in-one YouTube SEO optimization suite for content creators: thumbnail downloader ultra HD, AI tag generator, video rank tracker, metadata extractor, CTR analyzer and more.">
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Google Fonts: Inter (SF Pro-adjacent) + Manrope for display -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          canvas: '#0a0b0f',
+          panel: '#12131a',
+          line: 'rgba(255,255,255,0.08)',
+          accent: '#3b82f6',
+          accent2: '#8b5cf6',
+        },
+        fontFamily: {
+          display: ['Manrope', 'sans-serif'],
+          sans: ['Inter', 'sans-serif'],
+        },
+        borderRadius: {
+          'xl2': '1.25rem',
+          'xl3': '1.75rem',
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  :root{
+    --canvas-0:#070809;
+    --canvas-1:#0b0c11;
+    --canvas-2:#0f1016;
+    --glass-fill: rgba(255,255,255,0.045);
+    --glass-fill-strong: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.09);
+    --glass-border-soft: rgba(255,255,255,0.06);
+    --text-primary: #f5f6f8;
+    --text-secondary: #9ca0ad;
+    --text-tertiary: #6b6f7d;
+    --accent-blue:#3b82f6;
+    --accent-violet:#8b5cf6;
+    --accent-cyan:#22d3ee;
+    --success:#34d399;
+    --danger:#f87171;
+  }
+
+  *{ -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    background-color: var(--canvas-0);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  body{
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(59,130,246,0.16), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(139,92,246,0.10), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 5% 60%, rgba(34,211,238,0.06), transparent 60%),
+      var(--canvas-0);
+    background-attachment: fixed;
+  }
+
+  .font-display{ font-family: 'Manrope', 'Inter', sans-serif; letter-spacing: -0.02em; }
+
+  /* Fine grain noise overlay for premium texture */
+  .noise-layer{
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* === Glass panels === */
+  .glass{
+    background: linear-gradient(180deg, var(--glass-fill-strong), var(--glass-fill));
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+  }
+  .glass-soft{
+    background: var(--glass-fill);
+    border: 1px solid var(--glass-border-soft);
+    backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+  }
+  .glass-card{
+    background: linear-gradient(160deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015));
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    box-shadow: 0 1px 0 0 rgba(255,255,255,0.04) inset, 0 20px 40px -24px rgba(0,0,0,0.6);
+  }
+
+  /* Inner hairline highlight, like iOS cards catching light at top edge */
+  .edge-highlight{ position: relative; }
+  .edge-highlight::before{
+    content:"";
+    position:absolute; inset:0; border-radius: inherit; pointer-events:none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.10), transparent 30%);
+    mix-blend-mode: overlay;
+  }
+
+  /* === Scrollbar === */
+  ::-webkit-scrollbar{ width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track{ background: transparent; }
+  ::-webkit-scrollbar-thumb{ background: rgba(255,255,255,0.12); border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover{ background: rgba(255,255,255,0.2); }
+
+  /* === Sidebar === */
+  #sidebar{
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-item{
+    position: relative;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
+  }
+  .nav-item:hover{ background: rgba(255,255,255,0.05); }
+  .nav-item.active{
+    background: linear-gradient(135deg, rgba(59,130,246,0.18), rgba(139,92,246,0.10));
+    border: 1px solid rgba(59,130,246,0.25);
+  }
+  .nav-item.active .nav-dot{
+    background: var(--accent-blue);
+    box-shadow: 0 0 0 4px rgba(59,130,246,0.18);
+  }
+  .nav-item .nav-dot{
+    width:5px; height:5px; border-radius:50%;
+    background: rgba(255,255,255,0.18);
+    transition: all 0.25s ease;
+  }
+
+  .nav-section-label{
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .locked-badge{
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-tertiary);
+  }
+
+  .live-badge{
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(52,211,153,0.14);
+    border: 1px solid rgba(52,211,153,0.3);
+    color: #6ee7b7;
+  }
+
+  /* Blog independent CTA */
+  .blog-rail{
+    background: linear-gradient(135deg, rgba(139,92,246,0.16), rgba(34,211,238,0.08));
+    border: 1px solid rgba(139,92,246,0.28);
+  }
+  .blog-rail:hover{
+    border-color: rgba(139,92,246,0.5);
+    transform: translateY(-1px);
+  }
+
+  /* === Buttons === */
+  .btn-primary{
+    background: linear-gradient(135deg, #4f8ef7, #3b82f6 45%, #6d5bf0);
+    box-shadow: 0 1px 0 0 rgba(255,255,255,0.25) inset, 0 8px 24px -8px rgba(59,130,246,0.55);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  }
+  .btn-primary:hover{ filter: brightness(1.08); transform: translateY(-1px); }
+  .btn-primary:active{ transform: translateY(0px) scale(0.98); }
+  .btn-primary:disabled{ filter: grayscale(0.4) brightness(0.8); cursor: not-allowed; transform:none; }
+
+  .btn-ghost{
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.2s ease;
+  }
+  .btn-ghost:hover{ background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+
+  .icon-tile{
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
+  }
+  .group:hover .icon-tile{ transform: translateY(-2px) rotate(-2deg); }
+
+  /* === Inputs === */
+  .input-premium{
+    background: rgba(255,255,255,0.035);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  .input-premium:focus{
+    outline: none;
+    border-color: rgba(59,130,246,0.55);
+    background: rgba(255,255,255,0.05);
+    box-shadow: 0 0 0 4px rgba(59,130,246,0.14);
+  }
+
+  /* === Spinner === */
+  .spinner{
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(255,255,255,0.25);
+    border-top-color: #fff;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  /* === Toast === */
+  #toast-stack{
+    position: fixed; top: 20px; right: 20px; z-index: 100;
+    display:flex; flex-direction:column; gap:10px;
+    pointer-events:none;
+  }
+  .toast{
+    pointer-events:auto;
+    min-width: 280px; max-width: 360px;
+    border-radius: 16px;
+    padding: 14px 16px;
+    background: linear-gradient(160deg, rgba(20,21,28,0.92), rgba(13,14,20,0.94));
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    box-shadow: 0 16px 40px -12px rgba(0,0,0,0.55), 0 1px 0 0 rgba(255,255,255,0.06) inset;
+    display:flex; align-items:flex-start; gap:12px;
+    animation: toast-in 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+  .toast.toast-out{ animation: toast-out 0.3s ease forwards; }
+  @keyframes toast-in{
+    from{ opacity:0; transform: translateX(24px) scale(0.96); }
+    to{ opacity:1; transform: translateX(0) scale(1); }
+  }
+  @keyframes toast-out{
+    to{ opacity:0; transform: translateX(24px) scale(0.96); }
+  }
+  .toast-icon{
+    width: 30px; height:30px; border-radius: 9px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+
+  /* === Thumbnail result cards === */
+  .res-card{
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .res-card:hover{
+    transform: translateY(-4px);
+    border-color: rgba(59,130,246,0.35);
+    box-shadow: 0 24px 48px -20px rgba(0,0,0,0.55);
+  }
+
+  .quality-tag{
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .tag-ultra{ background: rgba(139,92,246,0.18); color:#c4b5fd; border:1px solid rgba(139,92,246,0.3); }
+  .tag-high{ background: rgba(59,130,246,0.18); color:#93c5fd; border:1px solid rgba(59,130,246,0.3); }
+  .tag-std{ background: rgba(34,211,238,0.14); color:#a5f3fc; border:1px solid rgba(34,211,238,0.26); }
+  .tag-low{ background: rgba(255,255,255,0.08); color:#cfd2da; border:1px solid rgba(255,255,255,0.14); }
+
+  /* skeleton shimmer for image loading */
+  .skeleton{
+    background: linear-gradient(100deg, rgba(255,255,255,0.04) 30%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 70%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease infinite;
+  }
+  @keyframes shimmer{ to{ background-position: -200% 0; } }
+
+  /* === Fade/slide in on load === */
+  @keyframes rise-in{
+    from{ opacity:0; transform: translateY(14px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  .rise-in{ animation: rise-in 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+
+  /* === Hero glow orb === */
+  .hero-orb{
+    position:absolute;
+    border-radius:50%;
+    filter: blur(60px);
+    opacity:0.55;
+    pointer-events:none;
+  }
+
+  /* === mobile sidebar overlay === */
+  #sidebar-overlay{
+    transition: opacity 0.3s ease;
+  }
+
+  /* utility: gradient text */
+  .grad-text{
+    background: linear-gradient(135deg, #93c5fd, #c4b5fd 55%, #67e8f9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* divider hairline */
+  .hairline{ background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent); height:1px; }
+
+  /* category pill in workspace tool grid */
+  .pill{
+    font-size:11px; font-weight:600; letter-spacing:0.03em;
+    padding: 4px 10px; border-radius:999px;
+    background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09);
+    color: var(--text-secondary);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+
+  /* focus visibility for accessibility */
+  a:focus-visible, button:focus-visible, input:focus-visible{
+    outline: 2px solid rgba(59,130,246,0.7);
+    outline-offset: 2px;
+  }
+</style>
+</head>
+
+<body class="antialiased min-h-screen">
+
+<div class="noise-layer"></div>
+
+<!-- Toast container -->
+<div id="toast-stack" aria-live="polite"></div>
+
+<!-- Mobile sidebar overlay -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden"></div>
+
+<div class="flex min-h-screen relative z-10">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside id="sidebar" class="fixed lg:sticky top-0 left-0 h-screen w-[280px] z-40 -translate-x-full lg:translate-x-0 flex flex-col">
+    <div class="glass m-3 lg:m-4 mr-0 lg:mr-0 rounded-xl3 flex flex-col h-[calc(100%-1.5rem)] lg:h-[calc(100vh-2rem)] overflow-hidden edge-highlight">
+
+      <!-- Brand -->
+      <div class="px-5 pt-6 pb-5 flex items-center justify-between">
+        <a href="index2.html" class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-[11px] bg-gradient-to-br from-blue-400 via-blue-500 to-violet-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <i class="fa-solid fa-bolt text-white text-sm"></i>
+          </div>
+          <div>
+            <p class="font-display font-bold text-[15px] leading-none tracking-tight">TubeKit <span class="grad-text">Pro</span></p>
+            <p class="text-[10.5px] text-white/35 mt-0.5 tracking-wide">Creator SEO Suite</p>
+          </div>
+        </a>
+        <button id="closeSidebarBtn" class="lg:hidden w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/5" aria-label="Close menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="hairline mx-5 mb-3"></div>
+
+      <!-- Nav scroll area -->
+      <nav class="flex-1 overflow-y-auto px-3 pb-4 space-y-5">
+
+        <!-- Workspace -->
+        <div>
+          <p class="nav-section-label px-3 mb-2">Workspace</p>
+          <a href="index2.html" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-xl" aria-current="page">
+            <span class="nav-dot"></span>
+            <i class="fa-solid fa-house text-[13px] w-4 text-center text-blue-300"></i>
+            <span class="text-[13.5px] font-medium flex-1">Dashboard</span>
+          </a>
+        </div>
+
+        <!-- Category 1: Thumbnail & Visual Assets -->
+        <div>
+          <p class="nav-section-label px-3 mb-2">Thumbnail &amp; Visual Assets</p>
+          <div class="space-y-1">
+            <a href="index2.html#thumbnail-grabber" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-image text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">Thumbnail Grabber</span>
+              <span class="live-badge">Live</span>
+            </a>
+            <a href="thumbnail-ab-tester.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-arrows-split-up-and-left text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">Thumbnail A/B Tester</span>
+              <span class="locked-badge">Soon</span>
+            </a>
+            <a href="ctr-analyzer.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-chart-line text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">CTR Analyzer</span>
+              <span class="locked-badge">Soon</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Category 2: Metadata & SEO -->
+        <div>
+          <p class="nav-section-label px-3 mb-2">Metadata &amp; SEO Tools</p>
+          <div class="space-y-1">
+            <a href="tags-generator.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-tags text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">AI Tag Generator</span>
+              <span class="locked-badge">Soon</span>
+            </a>
+            <a href="title-generator.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-heading text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">Title Optimizer</span>
+              <span class="locked-badge">Soon</span>
+            </a>
+            <a href="description-builder.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-align-left text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">Description Builder</span>
+              <span class="locked-badge">Soon</span>
+            </a>
+            <a href="metadata-extractor.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-database text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">Metadata Extractor</span>
+              <span class="locked-badge">Soon</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Category 3: Rank & Analytics -->
+        <div>
+          <p class="nav-section-label px-3 mb-2">Rank &amp; Analytics</p>
+          <div class="space-y-1">
+            <a href="rank-tracker.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-magnifying-glass-chart text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">Video Rank Tracker</span>
+              <span class="locked-badge">Soon</span>
+            </a>
+            <a href="competitor-analysis.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-people-arrows text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">Competitor Analysis</span>
+              <span class="locked-badge">Soon</span>
+            </a>
+            <a href="keyword-research.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-key text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">Keyword Research</span>
+              <span class="locked-badge">Soon</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Category 4: Channel Utilities -->
+        <div>
+          <p class="nav-section-label px-3 mb-2">Channel Utilities</p>
+          <div class="space-y-1">
+            <a href="channel-id-finder.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-id-badge text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">Channel ID Finder</span>
+              <span class="locked-badge">Soon</span>
+            </a>
+            <a href="hashtag-generator.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <span class="nav-dot"></span>
+              <i class="fa-solid fa-hashtag text-[13px] w-4 text-center text-white/60"></i>
+              <span class="text-[13.5px] font-medium flex-1">Hashtag Generator</span>
+              <span class="locked-badge">Soon</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- INDEPENDENT BLOG SECTION — intentionally separate, NOT nested in tools -->
+        <div>
+          <p class="nav-section-label px-3 mb-2">Learn</p>
+          <a href="blog.html" class="blog-rail nav-item flex items-center gap-3 px-3 py-3 rounded-xl">
+            <div class="w-8 h-8 rounded-[10px] bg-gradient-to-br from-violet-400/30 to-cyan-400/20 flex items-center justify-center border border-white/10">
+              <i class="fa-solid fa-graduation-cap text-[13px] text-violet-200"></i>
+            </div>
+            <span class="flex-1">
+              <span class="block text-[13.5px] font-semibold leading-tight">Creator Academy</span>
+              <span class="block text-[11px] text-white/45 leading-tight mt-0.5">SEO guides &amp; growth blog</span>
+            </span>
+            <i class="fa-solid fa-arrow-right text-[11px] text-white/40"></i>
+          </a>
+        </div>
+
+      </nav>
+
+      <!-- Sidebar footer / upgrade -->
+      <div class="p-4">
+        <div class="glass-card rounded-2xl p-4 edge-highlight">
+          <p class="text-[12.5px] font-semibold mb-1">Unlock all 12 tools</p>
+          <p class="text-[11.5px] text-white/45 leading-relaxed mb-3">Get the full content creator workflow: rank tracking, AI tags, CTR analysis and more.</p>
+          <a href="pricing.html" class="btn-primary block text-center text-[12.5px] font-semibold text-white rounded-xl py-2.5">Upgrade to Pro</a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <div class="flex-1 min-w-0 flex flex-col">
+
+    <!-- ===== TOP HEADER ===== -->
+    <header class="sticky top-0 z-20 px-3 lg:px-4 pt-3 lg:pt-4">
+      <div class="glass-soft rounded-2xl px-4 lg:px-6 py-3.5 flex items-center justify-between gap-4 edge-highlight">
+
+        <div class="flex items-center gap-3 min-w-0">
+          <button id="openSidebarBtn" class="lg:hidden w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70" aria-label="Open menu">
+            <i class="fa-solid fa-bars text-sm"></i>
+          </button>
+          <div class="min-w-0 hidden sm:block">
+            <p class="text-[13px] font-semibold text-white/90 truncate">Dashboard</p>
+            <p class="text-[11px] text-white/40 truncate">YouTube SEO optimization workspace</p>
+          </div>
+        </div>
+
+        <div class="flex-1 max-w-md hidden md:flex">
+          <div class="relative w-full">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30 text-[12px]"></i>
+            <input type="text" placeholder="Search tools, guides, or paste a video URL…" class="input-premium w-full rounded-xl pl-10 pr-3 py-2.5 text-[12.5px] placeholder:text-white/30 text-white/90 rounded-xl">
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 lg:gap-3">
+          <a href="blog.html" class="hidden md:flex items-center gap-1.5 px-3.5 py-2 rounded-xl btn-ghost text-[12.5px] font-medium text-white/80">
+            <i class="fa-regular fa-newspaper text-[12px]"></i> Blog
+          </a>
+          <button class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition" aria-label="Notifications">
+            <i class="fa-regular fa-bell text-[13px]"></i>
+          </button>
+          <button class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-white text-[12px] font-bold shadow-lg shadow-blue-500/20" aria-label="Account">
+            JD
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== PAGE CONTENT ===== -->
+    <main class="flex-1 px-3 lg:px-4 pb-16">
+
+      <!-- ===== HERO ===== -->
+      <section class="relative mt-5 lg:mt-6 rounded-xl3 overflow-hidden glass-card edge-highlight px-6 sm:px-10 py-12 sm:py-16">
+        <div class="hero-orb w-[420px] h-[420px] bg-blue-500/30 -top-40 -left-32"></div>
+        <div class="hero-orb w-[360px] h-[360px] bg-violet-500/25 -bottom-44 right-0"></div>
+
+        <div class="relative max-w-3xl rise-in">
+          <span class="pill inline-flex items-center gap-1.5 mb-5">
+            <i class="fa-solid fa-sparkles text-[10px] text-blue-300"></i> All-in-one Creator SEO Suite
+          </span>
+          <h1 class="font-display text-[34px] sm:text-[44px] lg:text-[52px] font-extrabold leading-[1.08] tracking-tight">
+            The complete <span class="grad-text">YouTube SEO optimization</span> toolkit for serious creators
+          </h1>
+          <p class="text-[14.5px] sm:text-[16px] text-white/55 mt-5 leading-relaxed max-w-2xl">
+            TubeKit Pro brings your entire content creator workflow into one premium workspace — a thumbnail downloader in ultra HD, an AI tag generator, a video rank tracker, a metadata extractor, a CTR analyzer, and a description builder, all designed to help your videos rank higher and get clicked more.
+          </p>
+          <div class="flex flex-wrap items-center gap-3 mt-8">
+            <a href="#thumbnail-grabber" class="btn-primary text-white text-[13.5px] font-semibold rounded-xl px-6 py-3 flex items-center gap-2">
+              <i class="fa-solid fa-download text-[12px]"></i> Try the Thumbnail Grabber
+            </a>
+            <a href="blog.html" class="btn-ghost text-white/80 text-[13.5px] font-medium rounded-xl px-6 py-3 flex items-center gap-2">
+              Visit Creator Academy <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </a>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-6 mt-10 text-white/40 text-[11.5px]">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400/80"></i> No watermarks, ever</span>
+            <span class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400/80"></i> Ultra HD resolution support</span>
+            <span class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400/80"></i> Zero install, runs in-browser</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TOOL GRID PREVIEW (12 tools overview) ===== -->
+      <section class="mt-10">
+        <div class="flex items-end justify-between mb-5">
+          <div>
+            <h2 class="font-display text-[20px] sm:text-[22px] font-bold tracking-tight">Your 12-tool content creator workflow</h2>
+            <p class="text-[13px] text-white/45 mt-1">One suite covering visual assets, metadata, ranking, and channel growth.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
+          <!-- Tool 1 - ACTIVE -->
+          <a href="#thumbnail-grabber" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-gradient-to-br from-blue-400/25 to-blue-600/15 border border-blue-400/20 flex items-center justify-center">
+                <i class="fa-solid fa-image text-blue-300 text-[15px]"></i>
+              </div>
+              <span class="live-badge">Live</span>
+            </div>
+            <p class="text-[14px] font-semibold">Thumbnail Grabber</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">Thumbnail downloader ultra HD — extract every resolution instantly.</p>
+          </a>
+
+          <!-- Tool 2 -->
+          <a href="thumbnail-ab-tester.html" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-arrows-split-up-and-left text-white/60 text-[15px]"></i>
+              </div>
+              <span class="locked-badge">Soon</span>
+            </div>
+            <p class="text-[14px] font-semibold">Thumbnail A/B Tester</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">Compare variants to predict click-through rate before you publish.</p>
+          </a>
+
+          <!-- Tool 3 -->
+          <a href="ctr-analyzer.html" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-chart-line text-white/60 text-[15px]"></i>
+              </div>
+              <span class="locked-badge">Soon</span>
+            </div>
+            <p class="text-[14px] font-semibold">CTR Analyzer</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">A click-through rate (CTR) analyzer that benchmarks thumbnails and titles.</p>
+          </a>
+
+          <!-- Tool 4 -->
+          <a href="tags-generator.html" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-tags text-white/60 text-[15px]"></i>
+              </div>
+              <span class="locked-badge">Soon</span>
+            </div>
+            <p class="text-[14px] font-semibold">AI Tag Generator</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">An AI tag generator that suggests high-ranking tags from your topic.</p>
+          </a>
+
+          <!-- Tool 5 -->
+          <a href="title-generator.html" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-heading text-white/60 text-[15px]"></i>
+              </div>
+              <span class="locked-badge">Soon</span>
+            </div>
+            <p class="text-[14px] font-semibold">Title Optimizer</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">Craft titles tuned for search intent and on-platform discovery.</p>
+          </a>
+
+          <!-- Tool 6 -->
+          <a href="description-builder.html" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-align-left text-white/60 text-[15px]"></i>
+              </div>
+              <span class="locked-badge">Soon</span>
+            </div>
+            <p class="text-[14px] font-semibold">Description Builder</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">A video description builder with keyword placement and timestamps.</p>
+          </a>
+
+          <!-- Tool 7 -->
+          <a href="metadata-extractor.html" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-database text-white/60 text-[15px]"></i>
+              </div>
+              <span class="locked-badge">Soon</span>
+            </div>
+            <p class="text-[14px] font-semibold">Metadata Extractor</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">A YouTube metadata extractor pulling tags, category, and schema data.</p>
+          </a>
+
+          <!-- Tool 8 -->
+          <a href="rank-tracker.html" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-magnifying-glass-chart text-white/60 text-[15px]"></i>
+              </div>
+              <span class="locked-badge">Soon</span>
+            </div>
+            <p class="text-[14px] font-semibold">Video Rank Tracker</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">A video rank tracker that monitors keyword positions over time.</p>
+          </a>
+
+          <!-- Tool 9 -->
+          <a href="competitor-analysis.html" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-people-arrows text-white/60 text-[15px]"></i>
+              </div>
+              <span class="locked-badge">Soon</span>
+            </div>
+            <p class="text-[14px] font-semibold">Competitor Analysis</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">Benchmark rival channels' tags, titles, and upload cadence.</p>
+          </a>
+
+          <!-- Tool 10 -->
+          <a href="keyword-research.html" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-key text-white/60 text-[15px]"></i>
+              </div>
+              <span class="locked-badge">Soon</span>
+            </div>
+            <p class="text-[14px] font-semibold">Keyword Research</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">Surface high-ranking search terms for your next upload.</p>
+          </a>
+
+          <!-- Tool 11 -->
+          <a href="channel-id-finder.html" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-id-badge text-white/60 text-[15px]"></i>
+              </div>
+              <span class="locked-badge">Soon</span>
+            </div>
+            <p class="text-[14px] font-semibold">Channel ID Finder</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">Resolve any handle or URL to its underlying channel ID.</p>
+          </a>
+
+          <!-- Tool 12 -->
+          <a href="hashtag-generator.html" class="group glass-card rounded-2xl p-5 res-card relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="icon-tile w-11 h-11 rounded-[13px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-hashtag text-white/60 text-[15px]"></i>
+              </div>
+              <span class="locked-badge">Soon</span>
+            </div>
+            <p class="text-[14px] font-semibold">Hashtag Generator</p>
+            <p class="text-[12px] text-white/45 mt-1.5 leading-relaxed">Generate trending, niche-relevant hashtags in one click.</p>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== ACTIVE TOOL: THUMBNAIL GRABBER ===== -->
+      <section id="thumbnail-grabber" class="mt-12 scroll-mt-24">
+        <div class="glass-card rounded-xl3 p-6 sm:p-10 edge-highlight relative overflow-hidden">
+          <div class="hero-orb w-[300px] h-[300px] bg-blue-500/15 top-0 right-0"></div>
+
+          <div class="relative max-w-2xl mb-8">
+            <span class="pill inline-flex items-center gap-1.5 mb-4">
+              <i class="fa-solid fa-circle-dot text-[9px] text-emerald-400"></i> Tool 1 of 12 — Active now
+            </span>
+            <h2 class="font-display text-[26px] sm:text-[30px] font-bold tracking-tight">YouTube Thumbnail Downloader Ultra HD</h2>
+            <p class="text-[13.5px] text-white/50 mt-3 leading-relaxed">
+              Paste any YouTube video URL to instantly preview and download its thumbnail in every available resolution — from ultra HD down to standard quality. Built for content creators who need fast, reliable access to thumbnail assets for design references, video rank tracker comparisons, or competitor research.
+            </p>
+          </div>
+
+          <!-- Input row -->
+          <div class="relative flex flex-col sm:flex-row gap-3 mb-3">
+            <div class="relative flex-1">
+              <i class="fa-brands fa-youtube absolute left-4 top-1/2 -translate-y-1/2 text-red-400/70 text-[16px]"></i>
+              <input
+                id="ytUrlInput"
+                type="text"
+                placeholder="https://www.youtube.com/watch?v=..."
+                class="input-premium w-full rounded-xl pl-11 pr-4 py-3.5 text-[13.5px] placeholder:text-white/30 text-white/90"
+                autocomplete="off"
+                spellcheck="false"
+              >
+            </div>
+            <button id="grabBtn" class="btn-primary text-white text-[13.5px] font-semibold rounded-xl px-7 py-3.5 flex items-center justify-center gap-2 shrink-0">
+              <span id="grabBtnIcon"><i class="fa-solid fa-bolt text-[12px]"></i></span>
+              <span id="grabBtnText">Grab Assets</span>
+            </button>
+          </div>
+          <p id="inputError" class="text-[12px] text-red-400/90 mt-1 hidden"><i class="fa-solid fa-triangle-exclamation mr-1"></i><span id="inputErrorText"></span></p>
+
+          <p class="text-[11.5px] text-white/35 mt-3">
+            Tip: works with standard links, shortened <span class="text-white/50 font-medium">youtu.be</span> links, Shorts, and embed URLs.
+          </p>
+
+          <!-- Results -->
+          <div id="resultsWrap" class="hidden mt-10">
+
+            <div class="hairline mb-8"></div>
+
+            <!-- Video meta strip -->
+            <div id="videoMetaStrip" class="flex items-center gap-4 mb-7 glass-soft rounded-2xl p-4">
+              <div class="w-[120px] h-[68px] rounded-xl overflow-hidden bg-white/5 shrink-0 relative">
+                <img id="metaThumb" src="" alt="Video thumbnail preview" class="w-full h-full object-cover">
+              </div>
+              <div class="min-w-0">
+                <p class="text-[12px] text-white/40">Video ID detected</p>
+                <p id="metaVideoId" class="text-[14px] font-semibold font-mono text-white/90 mt-0.5">—</p>
+              </div>
+              <div class="ml-auto hidden sm:flex items-center gap-2">
+                <span class="pill"><i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> Assets extracted</span>
+              </div>
+            </div>
+
+            <h3 class="text-[14px] font-semibold text-white/80 mb-4">Available resolutions</h3>
+
+            <div id="resGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- res cards injected by JS -->
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===== SEO CONTENT BLOCK ===== -->
+      <section class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div class="glass-card rounded-2xl p-6 edge-highlight">
+          <div class="w-10 h-10 rounded-[12px] bg-blue-500/15 border border-blue-400/20 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-magnifying-glass-chart text-blue-300 text-[14px]"></i>
+          </div>
+          <h3 class="text-[14.5px] font-semibold mb-2">Built for YouTube SEO optimization</h3>
+          <p class="text-[12.5px] text-white/45 leading-relaxed">
+            Every tool in this suite, from the AI tag generator to the upcoming video rank tracker, is designed around one goal: helping your content rank higher in YouTube and Google search results.
+          </p>
+        </div>
+        <div class="glass-card rounded-2xl p-6 edge-highlight">
+          <div class="w-10 h-10 rounded-[12px] bg-violet-500/15 border border-violet-400/20 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-gauge-high text-violet-300 text-[14px]"></i>
+          </div>
+          <h3 class="text-[14.5px] font-semibold mb-2">A faster content creator workflow</h3>
+          <p class="text-[12.5px] text-white/45 leading-relaxed">
+            Stop switching between five different browser extensions. TubeKit Pro centralizes thumbnail extraction, metadata lookups, and a video description builder into a single premium workspace.
+          </p>
+        </div>
+        <div class="glass-card rounded-2xl p-6 edge-highlight">
+          <div class="w-10 h-10 rounded-[12px] bg-cyan-500/15 border border-cyan-400/20 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-chart-simple text-cyan-300 text-[14px]"></i>
+          </div>
+          <h3 class="text-[14.5px] font-semibold mb-2">Data-informed CTR decisions</h3>
+          <p class="text-[12.5px] text-white/45 leading-relaxed">
+            Once live, the click-through rate (CTR) analyzer will pair directly with the thumbnail downloader ultra HD tool so you can test visuals against real performance signals.
+          </p>
+        </div>
+      </section>
+
+      <!-- ===== BLOG TEASER (separate from tools, reinforcing independence) ===== -->
+      <section class="mt-12">
+        <div class="blog-rail rounded-xl3 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 edge-highlight">
+          <div class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-graduation-cap text-violet-200 text-xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-display text-[18px] font-bold tracking-tight">Creator Academy — our independent SEO &amp; growth blog</h3>
+            <p class="text-[13px] text-white/55 mt-1.5 leading-relaxed max-w-2xl">
+              In-depth guides on YouTube metadata extractor workflows, writing titles that win the click, and building a repeatable content creator workflow. Separate from the tools, always free to read.
+            </p>
+          </div>
+          <a href="blog.html" class="btn-ghost text-white/90 text-[13px] font-semibold rounded-xl px-5 py-2.5 flex items-center gap-2 shrink-0">
+            Read the blog <i class="fa-solid fa-arrow-right text-[11px]"></i>
+          </a>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="px-3 lg:px-4 pb-6">
+      <div class="glass-soft rounded-2xl px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] text-white/35">
+        <p>© 2026 TubeKit Pro. Built for the modern content creator workflow.</p>
+        <div class="flex items-center gap-5">
+          <a href="blog.html" class="hover:text-white/70 transition">Blog</a>
+          <a href="pricing.html" class="hover:text-white/70 transition">Pricing</a>
+          <a href="privacy.html" class="hover:text-white/70 transition">Privacy</a>
+          <a href="terms.html" class="hover:text-white/70 transition">Terms</a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     MOBILE SIDEBAR TOGGLE
+  ============================================================ */
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const openBtn = document.getElementById('openSidebarBtn');
+  const closeBtn = document.getElementById('closeSidebarBtn');
+
+  function openSidebar(){
+    sidebar.classList.remove('-translate-x-full');
+    overlay.classList.remove('hidden');
+    requestAnimationFrame(()=> overlay.style.opacity = '1');
+  }
+  function closeSidebar(){
+    sidebar.classList.add('-translate-x-full');
+    overlay.style.opacity = '0';
+    setTimeout(()=> overlay.classList.add('hidden'), 250);
+  }
+  if(openBtn) openBtn.addEventListener('click', openSidebar);
+  if(closeBtn) closeBtn.addEventListener('click', closeSidebar);
+  if(overlay) overlay.addEventListener('click', closeSidebar);
+
+  /* ============================================================
+     TOAST NOTIFICATION SYSTEM
+  ============================================================ */
+  const toastStack = document.getElementById('toast-stack');
+
+  function showToast(type, title, message, duration){
+    duration = duration || 3800;
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+
+    const palettes = {
+      success: { bg:'rgba(52,211,153,0.15)', border:'rgba(52,211,153,0.3)', icon:'fa-solid fa-check', color:'#6ee7b7' },
+      error:   { bg:'rgba(248,113,113,0.15)', border:'rgba(248,113,113,0.3)', icon:'fa-solid fa-xmark', color:'#fca5a5' },
+      info:    { bg:'rgba(59,130,246,0.15)', border:'rgba(59,130,246,0.3)', icon:'fa-solid fa-circle-info', color:'#93c5fd' },
+    };
+    const p = palettes[type] || palettes.info;
+
+    toast.innerHTML =
+      '<div class="toast-icon" style="background:' + p.bg + ';border:1px solid ' + p.border + ';">' +
+        '<i class="' + p.icon + '" style="color:' + p.color + ';font-size:12px;"></i>' +
+      '</div>' +
+      '<div class="flex-1 min-w-0">' +
+        '<p class="text-[13px] font-semibold text-white/90 leading-tight">' + title + '</p>' +
+        '<p class="text-[11.5px] text-white/50 mt-0.5 leading-snug">' + message + '</p>' +
+      '</div>' +
+      '<button class="toast-close text-white/30 hover:text-white/70 transition shrink-0" aria-label="Dismiss notification">' +
+        '<i class="fa-solid fa-xmark text-[11px]"></i>' +
+      '</button>';
+
+    toastStack.appendChild(toast);
+
+    const removeToast = () => {
+      toast.classList.add('toast-out');
+      setTimeout(()=> toast.remove(), 320);
+    };
+
+    toast.querySelector('.toast-close').addEventListener('click', removeToast);
+    const timer = setTimeout(removeToast, duration);
+    toast.addEventListener('mouseenter', ()=> clearTimeout(timer));
+  }
+
+  /* ============================================================
+     YOUTUBE THUMBNAIL GRABBER — CORE LOGIC
+  ============================================================ */
+  const ytUrlInput   = document.getElementById('ytUrlInput');
+  const grabBtn       = document.getElementById('grabBtn');
+  const grabBtnIcon   = document.getElementById('grabBtnIcon');
+  const grabBtnText   = document.getElementById('grabBtnText');
+  const inputError     = document.getElementById('inputError');
+  const inputErrorText = document.getElementById('inputErrorText');
+  const resultsWrap    = document.getElementById('resultsWrap');
+  const resGrid        = document.getElementById('resGrid');
+  const metaThumb      = document.getElementById('metaThumb');
+  const metaVideoId    = document.getElementById('metaVideoId');
+
+  // Extracts an 11-character YouTube video ID from virtually any valid YouTube URL format.
+  function extractVideoId(rawUrl){
+    if(!rawUrl) return null;
+    const url = rawUrl.trim();
+
+    // Direct 11-char ID pasted alone (letters, numbers, - and _)
+    const bareIdPattern = /^[a-zA-Z0-9_-]{11}$/;
+    if(bareIdPattern.test(url)) return url;
+
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,         // watch?v=
+      /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,          // shorts/
+      /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,           // embed/
+      /(?:youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,            // live/
+      /(?:youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,               // /v/
+      /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,                     // youtu.be short links
+      /[?&]v=([a-zA-Z0-9_-]{11})/,                              // any ?v= param fallback
+    ];
+
+    for(const pattern of patterns){
+      const match = url.match(pattern);
+      if(match && match[1]) return match[1];
+    }
+    return null;
+  }
+
+  function buildThumbnailSet(videoId){
+    const base = 'https://img.youtube.com/vi/' + videoId + '/';
+    return [
+      {
+        key: 'maxres',
+        label: 'Ultra HD',
+        sub: '1920 × 1080',
+        tagClass: 'tag-ultra',
+        file: 'maxresdefault.jpg',
+        icon: 'fa-solid fa-crown',
+        note: 'Best available — not generated for every video'
+      },
+      {
+        key: 'sd',
+        label: 'High Quality',
+        sub: '640 × 480',
+        tagClass: 'tag-high',
+        file: 'sddefault.jpg',
+        icon: 'fa-solid fa-star',
+        note: 'Reliable HQ fallback, available for most videos'
+      },
+      {
+        key: 'hq',
+        label: 'Standard Quality',
+        sub: '480 × 360',
+        tagClass: 'tag-std',
+        file: 'hqdefault.jpg',
+        icon: 'fa-solid fa-image',
+        note: 'Always available, ideal for quick previews'
+      },
+      {
+        key: 'mq',
+        label: 'Medium Quality',
+        sub: '320 × 180',
+        tagClass: 'tag-low',
+        file: 'mqdefault.jpg',
+        icon: 'fa-solid fa-images',
+        note: 'Compact size, great for lightweight embeds'
+      },
+    ].map(item => Object.assign({}, item, { url: base + item.file, videoId }));
+  }
+
+  function setLoading(isLoading){
+    grabBtn.disabled = isLoading;
+    if(isLoading){
+      grabBtnIcon.innerHTML = '<span class="spinner"></span>';
+      grabBtnText.textContent = 'Grabbing…';
+    } else {
+      grabBtnIcon.innerHTML = '<i class="fa-solid fa-bolt text-[12px]"></i>';
+      grabBtnText.textContent = 'Grab Assets';
+    }
+  }
+
+  function showInputError(message){
+    inputErrorText.textContent = message;
+    inputError.classList.remove('hidden');
+    ytUrlInput.style.borderColor = 'rgba(248,113,113,0.5)';
+  }
+
+  function clearInputError(){
+    inputError.classList.add('hidden');
+    ytUrlInput.style.borderColor = '';
+  }
+
+  function renderResultCard(item){
+    const card = document.createElement('div');
+    card.className = 'res-card glass-card rounded-2xl overflow-hidden flex flex-col';
+
+    const imgWrapId = 'imgwrap-' + item.key;
+
+    card.innerHTML =
+      '<div class="relative aspect-video bg-white/5 overflow-hidden" id="' + imgWrapId + '">' +
+        '<div class="skeleton absolute inset-0"></div>' +
+        '<img src="' + item.url + '" alt="YouTube thumbnail in ' + item.label + ' resolution for video ' + item.videoId + '" ' +
+             'class="thumb-img relative w-full h-full object-cover opacity-0 transition-opacity duration-500" loading="lazy">' +
+        '<span class="quality-tag ' + item.tagClass + ' absolute top-2.5 left-2.5">' +
+          '<i class="' + item.icon + ' mr-1"></i>' + item.label +
+        '</span>' +
+      '</div>' +
+      '<div class="p-4 flex flex-col flex-1">' +
+        '<p class="text-[13px] font-semibold">' + item.label + '</p>' +
+        '<p class="text-[11px] text-white/40 mt-0.5">' + item.sub + ' &middot; ' + item.note + '</p>' +
+        '<div class="flex items-center gap-2 mt-4">' +
+          '<a href="' + item.url + '" target="_blank" rel="noopener noreferrer" class="btn-ghost flex-1 text-center text-[12px] font-medium text-white/80 rounded-lg py-2 flex items-center justify-center gap-1.5">' +
+            '<i class="fa-solid fa-eye text-[11px]"></i> View' +
+          '</a>' +
+          '<button type="button" data-download-url="' + item.url + '" data-download-name="thumbnail-' + item.videoId + '-' + item.key + '.jpg" class="download-btn flex-1 text-center text-[12px] font-semibold text-white rounded-lg py-2 flex items-center justify-center gap-1.5 btn-primary">' +
+            '<i class="fa-solid fa-download text-[11px]"></i> Download' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+
+    // Handle image load / error states (maxresdefault.jpg can 404 on lower-res uploads)
+    const imgEl = card.querySelector('.thumb-img');
+    const wrapEl = card.querySelector('#' + imgWrapId);
+    imgEl.addEventListener('load', function(){
+      // YouTube serves a 120x90 grey placeholder for missing maxres thumbnails.
+      if(imgEl.naturalWidth === 120 && imgEl.naturalHeight === 90){
+        wrapEl.querySelector('.skeleton').outerHTML =
+          '<div class="absolute inset-0 flex flex-col items-center justify-center text-white/30 gap-2">' +
+            '<i class="fa-solid fa-image-slash text-lg"></i>' +
+            '<span class="text-[11px]">Not available for this video</span>' +
+          '</div>';
+        imgEl.remove();
+      } else {
+        const skel = wrapEl.querySelector('.skeleton');
+        if(skel) skel.remove();
+        imgEl.style.opacity = '1';
+      }
+    });
+    imgEl.addEventListener('error', function(){
+      wrapEl.querySelector('.skeleton').outerHTML =
+        '<div class="absolute inset-0 flex flex-col items-center justify-center text-white/30 gap-2">' +
+          '<i class="fa-solid fa-triangle-exclamation text-lg"></i>' +
+          '<span class="text-[11px]">Failed to load</span>' +
+        '</div>';
+      imgEl.remove();
+    });
+
+    return card;
+  }
+
+  async function downloadImage(url, filename){
+    try{
+      const response = await fetch(url, { mode: 'cors' });
+      if(!response.ok) throw new Error('Network response was not ok');
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+      showToast('success', 'Download started', filename + ' is saving to your device.');
+    } catch(err){
+      // CORS or network restrictions: fall back to opening the asset directly so the
+      // user can still save it manually via the browser's native image menu.
+      window.open(url, '_blank', 'noopener,noreferrer');
+      showToast('info', 'Opened in new tab', 'Direct download was blocked — right-click the image to save it.');
+    }
+  }
+
+  resGrid.addEventListener('click', function(e){
+    const btn = e.target.closest('.download-btn');
+    if(!btn) return;
+    const url = btn.getAttribute('data-download-url');
+    const filename = btn.getAttribute('data-download-name');
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span>';
+    btn.disabled = true;
+    downloadImage(url, filename).finally(()=>{
+      btn.innerHTML = originalHTML;
+      btn.disabled = false;
+    });
+  });
+
+  function handleGrab(){
+    clearInputError();
+    const rawValue = ytUrlInput.value;
+
+    if(!rawValue || !rawValue.trim()){
+      showInputError('Paste a YouTube video URL first.');
+      ytUrlInput.focus();
+      return;
+    }
+
+    const videoId = extractVideoId(rawValue);
+    if(!videoId){
+      showInputError("That doesn't look like a valid YouTube URL. Try a full watch, Shorts, or youtu.be link.");
+      showToast('error', 'Could not parse URL', 'Double-check the link and try again.');
+      return;
+    }
+
+    setLoading(true);
+    resultsWrap.classList.add('hidden');
+
+    // Simulate a brief premium processing moment for perceived quality —
+    // the extraction itself is instant since it's pure URL parsing.
+    setTimeout(function(){
+      const thumbs = buildThumbnailSet(videoId);
+
+      resGrid.innerHTML = '';
+      thumbs.forEach(function(item){
+        resGrid.appendChild(renderResultCard(item));
+      });
+
+      metaThumb.src = thumbs[2].url; // hqdefault as the safe meta preview
+      metaThumb.alt = 'Preview thumbnail for video ' + videoId;
+      metaVideoId.textContent = videoId;
+
+      resultsWrap.classList.remove('hidden');
+      resultsWrap.classList.add('rise-in');
+      setLoading(false);
+
+      showToast('success', 'Assets extracted', '4 resolutions ready for video ' + videoId + '.');
+
+      resultsWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 650);
+  }
+
+  grabBtn.addEventListener('click', handleGrab);
+  ytUrlInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      handleGrab();
+    }
+  });
+  ytUrlInput.addEventListener('input', clearInputError);
+
+  // Deep-link support: ?url=<youtube-url> auto-fills and runs on load.
+  try{
+    const params = new URLSearchParams(window.location.search);
+    const prefill = params.get('url');
+    if(prefill){
+      ytUrlInput.value = prefill;
+      handleGrab();
+    }
+  } catch(e){ /* URLSearchParams unsupported — silently ignore */ }
+
+})();
+</script>
+
+</body>
+</html>
